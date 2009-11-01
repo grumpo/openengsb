@@ -17,13 +17,9 @@
  */
 package org.openengsb.connector.svn.commands;
 
-import java.io.File;
-
 import org.openengsb.scm.common.commands.Command;
 import org.openengsb.scm.common.commands.DeleteCommand;
 import org.openengsb.scm.common.exceptions.ScmException;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.wc.SVNWCClient;
 
 
 /**
@@ -36,33 +32,36 @@ public class SvnDeleteCommand extends AbstractSvnCommand<Object> implements Dele
 
     @Override
     public Object execute() throws ScmException {
-        // set up client
-        SVNWCClient client = getClientManager().getWCClient();
-
-        // set up parameters
-        File fileToDelete = new File(getWorkingCopy(), this.file);
-        boolean force = false;
-        boolean dryRun = false;
-
-        // sanity checks
-        if (!fileToDelete.exists()) {
-            throw new ScmException("File " + fileToDelete + " does not exist in working copy.");
-        }
-
-        if (!fileToDelete.getAbsolutePath().startsWith(getWorkingCopy().getAbsolutePath())) {
-            throw new ScmException("File " + fileToDelete
-                    + " left the working copy. Are you trying to do something nasty?");
-        }
-
-        // actual call to SVNKit
-        try {
-            client.doDelete(fileToDelete, force, dryRun);
-        } catch (SVNException exception) {
-            throw new ScmException(exception);
-        }
-
-        // dummy null-return
-        return null;
+    	// TODO implement via client adapter
+    	throw new ScmException("not implemented yet");
+    	
+//        // set up client
+//        SVNWCClient client = getClientManager().getWCClient();
+//
+//        // set up parameters
+//        File fileToDelete = new File(getWorkingCopy(), this.file);
+//        boolean force = false;
+//        boolean dryRun = false;
+//
+//        // sanity checks
+//        if (!fileToDelete.exists()) {
+//            throw new ScmException("File " + fileToDelete + " does not exist in working copy.");
+//        }
+//
+//        if (!fileToDelete.getAbsolutePath().startsWith(getWorkingCopy().getAbsolutePath())) {
+//            throw new ScmException("File " + fileToDelete
+//                    + " left the working copy. Are you trying to do something nasty?");
+//        }
+//
+//        // actual call to SVNKit
+//        try {
+//            client.doDelete(fileToDelete, force, dryRun);
+//        } catch (SVNException exception) {
+//            throw new ScmException(exception);
+//        }
+//
+//        // dummy null-return
+//        return null;
     }
 
     @Override

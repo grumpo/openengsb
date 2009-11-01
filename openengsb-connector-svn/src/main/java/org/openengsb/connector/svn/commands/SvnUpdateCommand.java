@@ -24,12 +24,10 @@ import org.openengsb.scm.common.commands.Command;
 import org.openengsb.scm.common.commands.UpdateCommand;
 import org.openengsb.scm.common.exceptions.ScmException;
 import org.openengsb.scm.common.pojos.MergeResult;
-import org.tmatesoft.svn.core.SVNDepth;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.wc.SVNEvent;
-import org.tmatesoft.svn.core.wc.SVNEventAction;
-import org.tmatesoft.svn.core.wc.SVNRevision;
-import org.tmatesoft.svn.core.wc.SVNUpdateClient;
+import org.tigris.subversion.svnclientadapter.ISVNNotifyListener;
+import org.tigris.subversion.svnclientadapter.SVNClientException;
+import org.tigris.subversion.svnclientadapter.SVNNodeKind;
+import org.tigris.subversion.svnclientadapter.SVNRevision;
 
 
 /**
@@ -48,28 +46,6 @@ public class SvnUpdateCommand extends AbstractSvnCommand<MergeResult> implements
         final ArrayList<String> mergedFiles = new ArrayList<String>();
         final ArrayList<String> deletedFiles = new ArrayList<String>();
 
-        // set up client
-        SVNUpdateClient client = getClientManager().getUpdateClient();
-        client.setEventHandler(new EventHandler() {
-            @Override
-            public void handleEvent(SVNEvent paramSVNEvent, double paramDouble) throws SVNException {
-                if (paramSVNEvent.getAction() != null) {
-                    int actionId = paramSVNEvent.getAction().getID();
-
-                    if (actionId == SVNEventAction.UPDATE_ADD.getID()) {
-                        addedFiles.add(paramSVNEvent.getFile().getPath());
-                    } else if (actionId == SVNEventAction.UPDATE_DELETE.getID()) {
-                        deletedFiles.add(paramSVNEvent.getFile().getPath());
-                    } else if (actionId == SVNEventAction.UPDATE_UPDATE.getID()) {
-                        mergedFiles.add(paramSVNEvent.getFile().getPath());
-                    } else if (actionId == SVNEventAction.UPDATE_REPLACE.getID()) {
-                        mergedFiles.add(paramSVNEvent.getFile().getPath());
-                        // else do nothing
-                    }
-                }
-            }
-        });
-
         // set up parameters
         File path = null;
         if ((this.updatePath == null) || (AbstractSvnCommand.HEAD_KEYWORD.equals(this.updatePath))) {
@@ -78,18 +54,27 @@ public class SvnUpdateCommand extends AbstractSvnCommand<MergeResult> implements
             path = new File(getWorkingCopy(), this.updatePath);
         }
 
-        SVNRevision revision = SVNRevision.HEAD;
-        SVNDepth depth = SVNDepth.INFINITY;
-        boolean allowUnversionedObstructions = false; // fail when a file shall
-        // be added to the WC but
-        // an unversioned file
-        // already exists
-        boolean depthIsSticky = false; // not quite sure what that means; let's
-        // leave it off then
-
+        // set up client
+        final ISVNNotifyListener listener = new DefaultNotifyListener() {
+        	 
+        	/* (non-Javadoc)
+			 * @see org.openengsb.connector.svn.commands.DefaultNotifyListener#onNotify(java.io.File, org.tigris.subversion.svnclientadapter.SVNNodeKind)
+			 */
+			@Override
+			public void onNotify(File file, SVNNodeKind kind) {
+				super.onNotify(file, kind);
+				
+				// TODO distinct add, delete and merge
+				if(kind.equals(SVNNodeKind.FILE)) {
+					mergedFiles.add(file.getPath());
+				}
+			}
+        };
+        getClient().addNotifyListener(listener);
+        
         try {
             // perform call
-            client.doUpdate(path, revision, depth, allowUnversionedObstructions, depthIsSticky);
+            getClient().update(path, SVNRevision.HEAD, true);
 
             // set up and fill result
             MergeResult result = new MergeResult();
@@ -99,8 +84,11 @@ public class SvnUpdateCommand extends AbstractSvnCommand<MergeResult> implements
 
             // TODO find out how to collect conflicts
             return result;
-        } catch (SVNException exception) {
+        } catch (SVNClientException exception) {
             throw new ScmException(exception);
+        } finally {
+            // unregister listener
+            getClient().removeNotifyListener(listener);
         }
     }
 

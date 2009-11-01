@@ -17,15 +17,9 @@
  */
 package org.openengsb.connector.svn.commands;
 
-import java.io.File;
-
 import org.openengsb.scm.common.commands.Command;
 import org.openengsb.scm.common.commands.ExportCommand;
 import org.openengsb.scm.common.exceptions.ScmException;
-import org.tmatesoft.svn.core.SVNDepth;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.wc.SVNRevision;
-import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 
 
 /**
@@ -39,27 +33,30 @@ public class SvnExportCommand extends AbstractSvnCommand<Object> implements Expo
 
     @Override
     public Object execute() throws ScmException {
-        // set up client
-        SVNUpdateClient client = getClientManager().getUpdateClient();
-
-        // set up parameters
-        File srcPath = getWorkingCopy();
-        File dstPath = new File(this.exportDestinationPath);
-        SVNRevision pegRevision = SVNRevision.HEAD;
-        SVNRevision revision = SVNRevision.HEAD;
-        String eolStyle = null;
-        boolean overwrite = false;
-        SVNDepth depth = SVNDepth.INFINITY;
-
-        // perform call
-        try {
-            client.doExport(srcPath, dstPath, pegRevision, revision, eolStyle, overwrite, depth);
-        } catch (SVNException exception) {
-            throw new ScmException(exception);
-        }
-
-        // dummy null-return
-        return null;
+    	// TODO implement via client adapter
+    	throw new ScmException("not implemented yet");
+    	
+//        // set up client
+//        SVNUpdateClient client = getClientManager().getUpdateClient();
+//
+//        // set up parameters
+//        File srcPath = getWorkingCopy();
+//        File dstPath = new File(this.exportDestinationPath);
+//        SVNRevision pegRevision = SVNRevision.HEAD;
+//        SVNRevision revision = SVNRevision.HEAD;
+//        String eolStyle = null;
+//        boolean overwrite = false;
+//        SVNDepth depth = SVNDepth.INFINITY;
+//
+//        // perform call
+//        try {
+//            client.doExport(srcPath, dstPath, pegRevision, revision, eolStyle, overwrite, depth);
+//        } catch (SVNException exception) {
+//            throw new ScmException(exception);
+//        }
+//
+//        // dummy null-return
+//        return null;
     }
 
     @Override

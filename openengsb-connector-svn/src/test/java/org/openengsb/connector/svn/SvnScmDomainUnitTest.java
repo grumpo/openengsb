@@ -20,6 +20,7 @@ package org.openengsb.connector.svn;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,10 +43,7 @@ import org.openengsb.scm.common.pojos.MergeResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.wc.SVNClientManager;
-import org.tmatesoft.svn.core.wc.SVNStatus;
-import org.tmatesoft.svn.core.wc.SVNStatusType;
+import org.tigris.subversion.svnclientadapter.SVNClientException;
 
 
 /**
@@ -58,8 +56,6 @@ public class SvnScmDomainUnitTest extends AbstractJUnit4SpringContextTests {
     private static String TRUNK;
     private static String REPOSITORY_NO_BRANCH;
     private static String REPOSITORY_NO_BRANCH_TRUNK;
-
-    private static SVNClientManager clientManager;
 
     @Autowired
     private SvnScmDomainTestConstants CONSTANTS;
@@ -102,7 +98,7 @@ public class SvnScmDomainUnitTest extends AbstractJUnit4SpringContextTests {
 
     @BeforeClass
     public static void setUpClientManager() {
-        SvnScmDomainUnitTest.clientManager = SVNClientManager.newInstance();
+
     }
 
     @Before
@@ -115,7 +111,7 @@ public class SvnScmDomainUnitTest extends AbstractJUnit4SpringContextTests {
     }
 
     @Before
-    public void setUpRepository() throws IOException, SVNException {
+    public void setUpRepository() throws IOException, SVNClientException {
         deleteRepository();
         FileUtils.copyDirectoryStructure(new File(this.CONSTANTS.REFERENCE_REPOSITORY), new File(
                 this.CONSTANTS.REPOSITORY));
@@ -263,26 +259,29 @@ public class SvnScmDomainUnitTest extends AbstractJUnit4SpringContextTests {
      * @throws SVNException
      */
     @Test
-    public void add_shouldAddFileToWorkingCopy() throws ScmException, IOException, SVNException {
-        CommandFactory commandFactory = createCommandFactory(this.CONSTANTS.WORKING_COPIES[0], null,
-                SvnScmDomainUnitTest.TRUNK);
-
-        // check out initial working copy
-        commandFactory.getCheckoutCommand(this.CONSTANTS.AUTHOR).execute();
-
-        // copy the file to add
-        File resourcesFileToAdd = new File(this.CONSTANTS.FILE_TO_ADD);
-        String fileToAddName = resourcesFileToAdd.getName();
-        File workingCopyFileToAdd = new File(new File(this.CONSTANTS.WORKING_COPIES[0]), fileToAddName);
-
-        FileUtils.copyFile(resourcesFileToAdd, workingCopyFileToAdd);
-
-        // call the actual method
-        commandFactory.getAddCommand(fileToAddName).execute();
-
-        // check if file was actually added
-        SVNStatus status = SvnScmDomainUnitTest.clientManager.getStatusClient().doStatus(workingCopyFileToAdd, false);
-        assertEquals(SVNStatusType.STATUS_ADDED.getID(), status.getContentsStatus().getID());
+    public void add_shouldAddFileToWorkingCopy() throws ScmException, IOException, SVNClientException {
+    	// TODO implement via client adapter
+    	fail("not implemented yet");
+    	
+//        CommandFactory commandFactory = createCommandFactory(this.CONSTANTS.WORKING_COPIES[0], null,
+//                SvnScmDomainUnitTest.TRUNK);
+//
+//        // check out initial working copy
+//        commandFactory.getCheckoutCommand(this.CONSTANTS.AUTHOR).execute();
+//
+//        // copy the file to add
+//        File resourcesFileToAdd = new File(this.CONSTANTS.FILE_TO_ADD);
+//        String fileToAddName = resourcesFileToAdd.getName();
+//        File workingCopyFileToAdd = new File(new File(this.CONSTANTS.WORKING_COPIES[0]), fileToAddName);
+//
+//        FileUtils.copyFile(resourcesFileToAdd, workingCopyFileToAdd);
+//
+//        // call the actual method
+//        commandFactory.getAddCommand(fileToAddName).execute();
+//
+//        // check if file was actually added
+//        SVNStatus status = SvnScmDomainUnitTest.clientManager.getStatusClient().doStatus(workingCopyFileToAdd, false);
+//        assertEquals(SVNStatusType.STATUS_ADDED.getID(), status.getContentsStatus().getID());
     }
 
     /**
@@ -335,20 +334,23 @@ public class SvnScmDomainUnitTest extends AbstractJUnit4SpringContextTests {
      * @throws SVNException
      */
     @Test
-    public void delete_shouldMarkFileForDeletion() throws ScmException, SVNException {
-        CommandFactory commandFactory = createCommandFactory(this.CONSTANTS.WORKING_COPIES[0], null,
-                SvnScmDomainUnitTest.TRUNK);
-
-        // check out initial working copy
-        commandFactory.getCheckoutCommand(this.CONSTANTS.AUTHOR).execute();
-
-        // call the actual method
-        commandFactory.getDeleteCommand(this.CONSTANTS.DELETE_FILE).execute();
-
-        // check if file was actually deleted
-        File workingCopyDeleteFile = new File(new File(this.CONSTANTS.WORKING_COPIES[0]), this.CONSTANTS.DELETE_FILE);
-        SVNStatus status = SvnScmDomainUnitTest.clientManager.getStatusClient().doStatus(workingCopyDeleteFile, false);
-        assertEquals(SVNStatusType.STATUS_DELETED.getID(), status.getContentsStatus().getID());
+    public void delete_shouldMarkFileForDeletion() throws ScmException, SVNClientException {
+    	// TODO implement via client adapter
+    	fail("not implemented yet");
+    	
+//        CommandFactory commandFactory = createCommandFactory(this.CONSTANTS.WORKING_COPIES[0], null,
+//                SvnScmDomainUnitTest.TRUNK);
+//
+//        // check out initial working copy
+//        commandFactory.getCheckoutCommand(this.CONSTANTS.AUTHOR).execute();
+//
+//        // call the actual method
+//        commandFactory.getDeleteCommand(this.CONSTANTS.DELETE_FILE).execute();
+//
+//        // check if file was actually deleted
+//        File workingCopyDeleteFile = new File(new File(this.CONSTANTS.WORKING_COPIES[0]), this.CONSTANTS.DELETE_FILE);
+//        SVNStatus status = SvnScmDomainUnitTest.clientManager.getStatusClient().doStatus(workingCopyDeleteFile, false);
+//        assertEquals(SVNStatusType.STATUS_DELETED.getID(), status.getContentsStatus().getID());
     }
 
     /**

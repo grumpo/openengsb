@@ -17,68 +17,91 @@
  */
 package org.openengsb.connector.svn.commands;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import org.openengsb.scm.common.commands.CheckoutCommand;
 import org.openengsb.scm.common.commands.Command;
 import org.openengsb.scm.common.exceptions.ScmException;
 import org.openengsb.scm.common.pojos.MergeResult;
-import org.tmatesoft.svn.core.SVNDepth;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNURL;
-import org.tmatesoft.svn.core.wc.SVNEvent;
-import org.tmatesoft.svn.core.wc.SVNEventAction;
-import org.tmatesoft.svn.core.wc.SVNRevision;
-import org.tmatesoft.svn.core.wc.SVNUpdateClient;
-
+import org.tigris.subversion.svnclientadapter.ISVNNotifyListener;
+import org.tigris.subversion.svnclientadapter.SVNClientException;
+import org.tigris.subversion.svnclientadapter.SVNNodeKind;
+import org.tigris.subversion.svnclientadapter.SVNRevision;
+import org.tigris.subversion.svnclientadapter.SVNUrl;
+import org.tigris.subversion.svnclientadapter.utils.Depth;
 
 /**
  * A Command that checks out the remote repository's content into the folder
  * supplied in the SU-configuration. Implements the general contracts of
  * <code>{@link Command}</code> and <code>{@link CheckoutCommand}</code>.
  */
-public class SvnCheckoutCommand extends AbstractSvnCommand<MergeResult> implements CheckoutCommand {
-    @SuppressWarnings("unused")
-    private String author = null; // TODO use
+public class SvnCheckoutCommand extends AbstractSvnCommand<MergeResult>
+		implements CheckoutCommand {
+	@SuppressWarnings("unused")
+	private String author = null; // TODO use
 
-    @Override
-    public MergeResult execute() throws ScmException {
-        try {
-            // set up parameters
-            SVNURL svnUrl = SVNURL.create(getRepositoryUri().getScheme(), getRepositoryUri().getUserInfo(),
-                    getRepositoryUri().getHost(), getRepositoryUri().getPort(), getRepositoryUri().getPath(), true);
-            SVNRevision revision = SVNRevision.HEAD;
-            SVNDepth depth = SVNDepth.INFINITY;
+	@Override
+	public MergeResult execute() throws ScmException {
 
-            // set up client
-            SVNUpdateClient client = getClientManager().getUpdateClient();
-            final ArrayList<String> checkedOutFiles = new ArrayList<String>();
-            client.setEventHandler(new EventHandler() {
-                @Override
-                public void handleEvent(SVNEvent paramSVNEvent, double paramDouble) throws SVNException {
-                    // check if event means, that a file was added (freshly
-                    // checked out)
-                    if (paramSVNEvent.getAction().getID() == SVNEventAction.UPDATE_ADD.getID()) {
-                        checkedOutFiles.add(paramSVNEvent.getFile().getPath());
-                    }
-                }
+		// set up parameters
+		SVNUrl svnUrl;
+		try {
+			svnUrl = new SVNUrl(new URI(getRepositoryUri().getScheme(),
+					getRepositoryUri().getUserInfo(), getRepositoryUri()
+							.getHost(), getRepositoryUri().getPort(),
+					getRepositoryUri().getPath(), "", "").toString());
 
-            });
+		} catch (MalformedURLException e) {
+			throw new ScmException(e.getMessage(), e);
+		} catch (URISyntaxException e) {
+			throw new ScmException(e.getMessage(), e);
+		}
 
-            // call checkout
-            long longRevision = client.doCheckout(svnUrl, getWorkingCopy(), revision, revision, depth, true);
+		// set up client
+		final ArrayList<String> checkedOutFiles = new ArrayList<String>();
+		final ISVNNotifyListener listener = new DefaultNotifyListener() {
 
-            MergeResult result = new MergeResult();
-            result.setAdds(checkedOutFiles.toArray(new String[checkedOutFiles.size()]));
-            result.setRevision(String.valueOf(longRevision));
-            return result;
-        } catch (SVNException exception) {
-            throw new ScmException(exception);
-        }
-    }
+			/*
+			 * (non-Javadoc)
+			 * @see	org.openengsb.connector.svn.commands.DefaultNotifyListener#onNotify(java.io.File, org.tigris.subversion.svnclientadapter.SVNNodeKind)
+			 */
+			@Override
+			public void onNotify(File file, SVNNodeKind kind) {
+				super.onNotify(file, kind);
 
-    @Override
-    public void setAuthor(String author) {
-        this.author = author;
-    }
+				if (kind.equals(SVNNodeKind.FILE)) {
+					checkedOutFiles.add(file.getPath());
+				}
+			}
+		};
+		getClient().addNotifyListener(listener);
+
+		try {
+			// call checkout
+			getClient().checkout(svnUrl, getWorkingCopy(), SVNRevision.HEAD,
+					Depth.infinity, true, true);
+
+			MergeResult result = new MergeResult();
+			result.setAdds(checkedOutFiles.toArray(new String[checkedOutFiles
+					.size()]));
+			result.setRevision(String.valueOf(getClient().getInfo(
+					getWorkingCopy()).getCopyRev().getNumber()));
+			return result;
+		} catch (SVNClientException e) {
+			throw new ScmException(e.getMessage(), e);
+		} finally {
+			// unregister listener
+			getClient().removeNotifyListener(listener);
+		}
+
+	}
+
+	@Override
+	public void setAuthor(String author) {
+		this.author = author;
+	}
 }

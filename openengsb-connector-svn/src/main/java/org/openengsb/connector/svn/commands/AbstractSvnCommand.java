@@ -19,13 +19,10 @@ package org.openengsb.connector.svn.commands;
 
 import org.openengsb.scm.common.commands.AbstractScmCommand;
 import org.openengsb.scm.common.exceptions.ScmException;
-import org.tmatesoft.svn.core.SVNCancelException;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNURL;
-import org.tmatesoft.svn.core.wc.ISVNEventHandler;
-import org.tmatesoft.svn.core.wc.SVNClientManager;
-import org.tmatesoft.svn.core.wc.SVNInfo;
-import org.tmatesoft.svn.core.wc.SVNRevision;
+import org.tigris.subversion.svnclientadapter.ISVNClientAdapter;
+import org.tigris.subversion.svnclientadapter.SVNClientAdapterFactory;
+import org.tigris.subversion.svnclientadapter.SVNClientException;
+import org.tigris.subversion.svnclientadapter.SVNUrl;
 
 
 /**
@@ -41,37 +38,22 @@ public abstract class AbstractSvnCommand<ReturnType> extends AbstractScmCommand<
     protected static final String TRUNK_KEYWORD = "TRUNK";
     protected static final String BRANCHES = "branches";
     protected static final String TRUNK = "trunk";
-
-    private SVNClientManager clientManager = null;
-
+    
+    private ISVNClientAdapter client = null;
+    
+    // TODO inject
+    protected String clientType = "javahl";
+    
     /* getters and setters */
 
-    protected SVNClientManager getClientManager() {
-        return this.clientManager;
-    }
-
-    protected void setClientManager(SVNClientManager clientManager) {
-        this.clientManager = clientManager;
+    protected ISVNClientAdapter getClient() {
+    	if(this.client == null) {
+    		this.client = SVNClientAdapterFactory.createSVNClient(this.clientType);
+    	}
+        return this.client;
     }
 
     /* end getters and setters */
-
-    /* nested classes */
-
-    /**
-     * Default-Implementation of ISVNEventHandler. This class implementes
-     * <code>checkCancelled()</code> as empty method, since it is not needed in
-     * our implementation. <code>checkCancelled()</code> would give us the
-     * opportunity to cancel an svn-operation which we do not want in any case.
-     */
-    protected static abstract class EventHandler implements ISVNEventHandler {
-        @Override
-        public void checkCancelled() throws SVNCancelException {
-            // intentionally left blank
-        }
-    }
-
-    /* end nested classes */
 
     /* helpers */
 
@@ -81,15 +63,11 @@ public abstract class AbstractSvnCommand<ReturnType> extends AbstractScmCommand<
      * @return The retreived URL
      * @throws ScmException
      */
-    protected SVNURL getRepositoryUrl() throws ScmException {
+    protected SVNUrl getRepositoryUrl() throws ScmException {
         try {
-            SVNRevision revision = null;
+            return getClient().getInfo(getWorkingCopy()).getRepository();
 
-            SVNInfo info = this.clientManager.getWCClient().doInfo(getWorkingCopy(), revision);
-            SVNURL repositoryUrl = info.getRepositoryRootURL();
-
-            return repositoryUrl;
-        } catch (SVNException exception) {
+        } catch (SVNClientException exception) {
             throw new ScmException(exception);
         }
     }
@@ -103,15 +81,11 @@ public abstract class AbstractSvnCommand<ReturnType> extends AbstractScmCommand<
      * @return The requested URL + subpath
      * @throws ScmException
      */
-    protected SVNURL getRepositoryUrlRelativeToWorkigCopy() throws ScmException {
+    protected SVNUrl getRepositoryUrlRelativeToWorkigCopy() throws ScmException {
         try {
-            SVNRevision revision = null;
+            return getClient().getInfo(getWorkingCopy()).getUrl();
 
-            SVNInfo info = this.clientManager.getWCClient().doInfo(getWorkingCopy(), revision);
-            SVNURL repositoryUrl = info.getURL();
-
-            return repositoryUrl;
-        } catch (SVNException exception) {
+        } catch (SVNClientException exception) {
             throw new ScmException(exception);
         }
     }

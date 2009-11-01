@@ -58,10 +58,7 @@ import org.openengsb.scm.common.util.StringSerializer;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.wc.SVNClientManager;
-import org.tmatesoft.svn.core.wc.SVNStatus;
-import org.tmatesoft.svn.core.wc.SVNStatusType;
+import org.tigris.subversion.svnclientadapter.SVNClientException;
 
 
 /**
@@ -74,7 +71,6 @@ import org.tmatesoft.svn.core.wc.SVNStatusType;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/integrationtestSpring.xml" })
 public class SvnScmComponentIntegrationTest extends SpringTestSupport {
-    private static SVNClientManager clientManager;
 
     /**
      * The constants needed for the tests
@@ -137,7 +133,7 @@ public class SvnScmComponentIntegrationTest extends SpringTestSupport {
 
     @BeforeClass
     public static void setUpClientManager() {
-        SvnScmComponentIntegrationTest.clientManager = SVNClientManager.newInstance();
+
     }
 
     /**
@@ -245,17 +241,20 @@ public class SvnScmComponentIntegrationTest extends SpringTestSupport {
      */
     @Test
     public void add_shouldAddFileToWorkingCopy() throws Exception {
-        // set up and perform checkout
-        doCheckoutRepository(this.CONSTANTS.CHECKOUT_WC1_TRUNK_SERVICE_NAME);
-
-        // copy the file to add
-        File resourcesFileToAdd = new File(this.CONSTANTS.FILE_TO_ADD);
-        File addedFile = doAddFile(resourcesFileToAdd, this.CONSTANTS.WORKING_COPIES[0], null,
-                this.CONSTANTS.ADD_SERVICE_NAME);
-
-        // check if file was actually added
-        SVNStatus status = SvnScmComponentIntegrationTest.clientManager.getStatusClient().doStatus(addedFile, false);
-        assertEquals(SVNStatusType.STATUS_ADDED.getID(), status.getContentsStatus().getID());
+    	// TODO implement via client adapter
+    	fail("not implemented yet");
+    	
+//        // set up and perform checkout
+//        doCheckoutRepository(this.CONSTANTS.CHECKOUT_WC1_TRUNK_SERVICE_NAME);
+//
+//        // copy the file to add
+//        File resourcesFileToAdd = new File(this.CONSTANTS.FILE_TO_ADD);
+//        File addedFile = doAddFile(resourcesFileToAdd, this.CONSTANTS.WORKING_COPIES[0], null,
+//                this.CONSTANTS.ADD_SERVICE_NAME);
+//
+//        // check if file was actually added
+//        SVNStatus status = SvnScmComponentIntegrationTest.clientManager.getStatusClient().doStatus(addedFile, false);
+//        assertEquals(SVNStatusType.STATUS_ADDED.getID(), status.getContentsStatus().getID());
     }
 
     /**
@@ -286,17 +285,20 @@ public class SvnScmComponentIntegrationTest extends SpringTestSupport {
      */
     @Test
     public void delete_shouldMarkfileForDeletion() throws Exception {
-        // set up and perform checkout
-        doCheckoutRepository(this.CONSTANTS.CHECKOUT_WC1_TRUNK_SERVICE_NAME);
-
-        // set up and perform delete
-        doDeleteFile(this.CONSTANTS.DELETE_FILE, this.CONSTANTS.DELETE_SERVICE_NAME);
-
-        // check if file was actually deleted
-        File workingCopyDeleteFile = new File(new File(this.CONSTANTS.WORKING_COPIES[0]), this.CONSTANTS.DELETE_FILE);
-        SVNStatus status = SvnScmComponentIntegrationTest.clientManager.getStatusClient().doStatus(
-                workingCopyDeleteFile, false);
-        assertEquals(SVNStatusType.STATUS_DELETED.getID(), status.getContentsStatus().getID());
+    	// TODO implement via client adapter
+    	fail("not implemented yet");
+    	
+//        // set up and perform checkout
+//        doCheckoutRepository(this.CONSTANTS.CHECKOUT_WC1_TRUNK_SERVICE_NAME);
+//
+//        // set up and perform delete
+//        doDeleteFile(this.CONSTANTS.DELETE_FILE, this.CONSTANTS.DELETE_SERVICE_NAME);
+//
+//        // check if file was actually deleted
+//        File workingCopyDeleteFile = new File(new File(this.CONSTANTS.WORKING_COPIES[0]), this.CONSTANTS.DELETE_FILE);
+//        SVNStatus status = SvnScmComponentIntegrationTest.clientManager.getStatusClient().doStatus(
+//                workingCopyDeleteFile, false);
+//        assertEquals(SVNStatusType.STATUS_DELETED.getID(), status.getContentsStatus().getID());
     }
 
     /**
@@ -1758,7 +1760,7 @@ public class SvnScmComponentIntegrationTest extends SpringTestSupport {
         this.environmentIsSetUp = true;
     }
 
-    private void setUpRepository() throws IOException, SVNException {
+    private void setUpRepository() throws IOException, SVNClientException {
         deleteRepository();
         FileUtils.copyDirectoryStructure(new File(this.CONSTANTS.REFERENCE_REPOSITORY), new File(
                 this.CONSTANTS.REPOSITORY));

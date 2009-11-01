@@ -17,18 +17,11 @@
  */
 package org.openengsb.connector.svn.commands;
 
-import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.openengsb.scm.common.commands.Command;
 import org.openengsb.scm.common.commands.LogCommand;
 import org.openengsb.scm.common.exceptions.ScmException;
-import org.tmatesoft.svn.core.ISVNLogEntryHandler;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNLogEntry;
-import org.tmatesoft.svn.core.wc.SVNLogClient;
-import org.tmatesoft.svn.core.wc.SVNRevision;
 
 
 /**
@@ -43,53 +36,56 @@ public class SvnLogCommand extends AbstractSvnCommand<Map<String, String>> imple
 
     @Override
     public Map<String, String> execute() throws ScmException {
-        // set up client
-        SVNLogClient logClient = getClientManager().getLogClient();
-
-        // set up parameters
-        File[] paths = new File[this.files.length];
-        SVNRevision startSvnRevision = null;
-        SVNRevision endSvnRevision = null;
-        boolean stopOnCopy = false;
-        boolean discoverChangedPaths = false;
-        long limit = Long.MAX_VALUE; // yes, we want it all. MUAHAHAHA
-
-        final Map<String, String> result = new HashMap<String, String>();
-        ISVNLogEntryHandler handler = new ISVNLogEntryHandler() {
-            @Override
-            public void handleLogEntry(SVNLogEntry logEntry) throws SVNException {
-                result.put(String.valueOf(logEntry.getRevision()), logEntry.getMessage());
-            }
-        };
-
-        // additional set up
-        for (int i = 0; i < this.files.length; i++) {
-            paths[i] = new File(getWorkingCopy(), this.files[i]);
-        }
-
-        try {
-            if (AbstractSvnCommand.HEAD_KEYWORD.equals(this.startRevision)) {
-                startSvnRevision = SVNRevision.HEAD;
-            } else {
-                startSvnRevision = SVNRevision.create(Long.parseLong(this.startRevision));
-            }
-
-            if (AbstractSvnCommand.HEAD_KEYWORD.equals(this.endRevision)) {
-                endSvnRevision = SVNRevision.HEAD;
-            } else {
-                endSvnRevision = SVNRevision.create(Long.parseLong(this.endRevision));
-            }
-        } catch (NumberFormatException exception) {
-            throw new ScmException("Revision mus be positive integer or " + AbstractSvnCommand.HEAD_KEYWORD);
-        }
-
-        // perform call
-        try {
-            logClient.doLog(paths, startSvnRevision, endSvnRevision, stopOnCopy, discoverChangedPaths, limit, handler);
-            return result;
-        } catch (SVNException exception) {
-            throw new ScmException(exception);
-        }
+    	// TODO implement via client adapter
+    	throw new ScmException("not implemented yet");
+    	
+//        // set up client
+//        SVNLogClient logClient = getClientManager().getLogClient();
+//
+//        // set up parameters
+//        File[] paths = new File[this.files.length];
+//        SVNRevision startSvnRevision = null;
+//        SVNRevision endSvnRevision = null;
+//        boolean stopOnCopy = false;
+//        boolean discoverChangedPaths = false;
+//        long limit = Long.MAX_VALUE; // yes, we want it all. MUAHAHAHA
+//
+//        final Map<String, String> result = new HashMap<String, String>();
+//        ISVNLogEntryHandler handler = new ISVNLogEntryHandler() {
+//            @Override
+//            public void handleLogEntry(SVNLogEntry logEntry) throws SVNException {
+//                result.put(String.valueOf(logEntry.getRevision()), logEntry.getMessage());
+//            }
+//        };
+//
+//        // additional set up
+//        for (int i = 0; i < this.files.length; i++) {
+//            paths[i] = new File(getWorkingCopy(), this.files[i]);
+//        }
+//
+//        try {
+//            if (AbstractSvnCommand.HEAD_KEYWORD.equals(this.startRevision)) {
+//                startSvnRevision = SVNRevision.HEAD;
+//            } else {
+//                startSvnRevision = SVNRevision.create(Long.parseLong(this.startRevision));
+//            }
+//
+//            if (AbstractSvnCommand.HEAD_KEYWORD.equals(this.endRevision)) {
+//                endSvnRevision = SVNRevision.HEAD;
+//            } else {
+//                endSvnRevision = SVNRevision.create(Long.parseLong(this.endRevision));
+//            }
+//        } catch (NumberFormatException exception) {
+//            throw new ScmException("Revision mus be positive integer or " + AbstractSvnCommand.HEAD_KEYWORD);
+//        }
+//
+//        // perform call
+//        try {
+//            logClient.doLog(paths, startSvnRevision, endSvnRevision, stopOnCopy, discoverChangedPaths, limit, handler);
+//            return result;
+//        } catch (SVNException exception) {
+//            throw new ScmException(exception);
+//        }
     }
 
     @Override

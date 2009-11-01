@@ -17,16 +17,9 @@
  */
 package org.openengsb.connector.svn.commands;
 
-import java.io.File;
-
 import org.openengsb.scm.common.commands.Command;
 import org.openengsb.scm.common.commands.SwitchBranchCommand;
 import org.openengsb.scm.common.exceptions.ScmException;
-import org.tmatesoft.svn.core.SVNDepth;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNURL;
-import org.tmatesoft.svn.core.wc.SVNRevision;
-import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 
 
 /**
@@ -38,43 +31,46 @@ public class SvnSwitchBranchCommand extends AbstractSvnCommand<Object> implement
 
     @Override
     public Object execute() throws ScmException {
-        // set up client
-        SVNUpdateClient client = getClientManager().getUpdateClient();
-
-        try {
-            // set up parameters
-            SVNURL repositoryUrl = getRepositoryUrl();
-            SVNURL branchUrl = null;
-            if (AbstractSvnCommand.TRUNK_KEYWORD.equals(this.branchName)) // we
-            // want
-            // to
-            // switch
-            // back
-            // to
-            // trunk
-            {
-                branchUrl = repositoryUrl.appendPath(AbstractSvnCommand.TRUNK, true);
-            } else // we want to switch to branchName
-            {
-                SVNURL branchesUrl = repositoryUrl.appendPath(AbstractSvnCommand.BRANCHES, true);
-                branchUrl = branchesUrl.appendPath(this.branchName, true);
-            }
-
-            File path = getWorkingCopy();
-            SVNRevision pegRevision = SVNRevision.HEAD;
-            SVNRevision revision = SVNRevision.HEAD;
-            SVNDepth depth = SVNDepth.INFINITY;
-            boolean allowUnversionedObstructions = false;
-            boolean depthIsSticky = true;
-
-            // perform call
-            client.doSwitch(path, branchUrl, pegRevision, revision, depth, allowUnversionedObstructions, depthIsSticky);
-        } catch (SVNException exception) {
-            throw new ScmException(exception);
-        }
-
-        // dummy null-return
-        return null;
+    	// TODO implement via client adapter
+    	throw new ScmException("not implemented yet");
+    	
+//        // set up client
+//        SVNUpdateClient client = getClientManager().getUpdateClient();
+//
+//        try {
+//            // set up parameters
+//            SVNURL repositoryUrl = getRepositoryUrl();
+//            SVNURL branchUrl = null;
+//            if (AbstractSvnCommand.TRUNK_KEYWORD.equals(this.branchName)) // we
+//            // want
+//            // to
+//            // switch
+//            // back
+//            // to
+//            // trunk
+//            {
+//                branchUrl = repositoryUrl.appendPath(AbstractSvnCommand.TRUNK, true);
+//            } else // we want to switch to branchName
+//            {
+//                SVNURL branchesUrl = repositoryUrl.appendPath(AbstractSvnCommand.BRANCHES, true);
+//                branchUrl = branchesUrl.appendPath(this.branchName, true);
+//            }
+//
+//            File path = getWorkingCopy();
+//            SVNRevision pegRevision = SVNRevision.HEAD;
+//            SVNRevision revision = SVNRevision.HEAD;
+//            SVNDepth depth = SVNDepth.INFINITY;
+//            boolean allowUnversionedObstructions = false;
+//            boolean depthIsSticky = true;
+//
+//            // perform call
+//            client.doSwitch(path, branchUrl, pegRevision, revision, depth, allowUnversionedObstructions, depthIsSticky);
+//        } catch (SVNException exception) {
+//            throw new ScmException(exception);
+//        }
+//
+//        // dummy null-return
+//        return null;
     }
 
     @Override

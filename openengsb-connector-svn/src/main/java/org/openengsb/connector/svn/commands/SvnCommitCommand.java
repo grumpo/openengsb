@@ -24,13 +24,9 @@ import org.openengsb.scm.common.commands.Command;
 import org.openengsb.scm.common.commands.CommitCommand;
 import org.openengsb.scm.common.exceptions.ScmException;
 import org.openengsb.scm.common.pojos.MergeResult;
-import org.tmatesoft.svn.core.SVNCommitInfo;
-import org.tmatesoft.svn.core.SVNDepth;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNProperties;
-import org.tmatesoft.svn.core.wc.SVNCommitClient;
-import org.tmatesoft.svn.core.wc.SVNEvent;
-import org.tmatesoft.svn.core.wc.SVNEventAction;
+import org.tigris.subversion.svnclientadapter.ISVNNotifyListener;
+import org.tigris.subversion.svnclientadapter.SVNClientException;
+import org.tigris.subversion.svnclientadapter.SVNNodeKind;
 
 
 /**
@@ -56,17 +52,7 @@ public class SvnCommitCommand extends AbstractSvnCommand<MergeResult> implements
             paths[0] = new File(paths[0], this.subPath);
         }
 
-        boolean keepLocks = false; // we do not use locks anyway, but if
-        // something got locked, at least a commit
-        // will unlock it
         String commitMessage = (this.author.isEmpty() ? "" : this.author + ":\n") + this.message;
-        SVNProperties properties = new SVNProperties();
-        // properties.put (SVNRevisionProperty.AUTHOR, author); darn, cannot add
-        // author here :/
-        String[] changelists = new String[0]; // should be implemented? hmm
-        boolean keepChangelist = false;
-        boolean force = false;
-        SVNDepth depth = SVNDepth.INFINITY;
 
         // set up intermediate lists for result
         final ArrayList<String> addedFiles = new ArrayList<String>();
@@ -74,49 +60,44 @@ public class SvnCommitCommand extends AbstractSvnCommand<MergeResult> implements
         final ArrayList<String> deletedFiles = new ArrayList<String>();
 
         // set up client
-        SVNCommitClient client = getClientManager().getCommitClient();
-        client.setEventHandler(new EventHandler() {
-            @Override
-            public void handleEvent(SVNEvent paramSVNEvent, double paramDouble) throws SVNException {
-                if (paramSVNEvent.getAction() != null) {
-                    int actionId = paramSVNEvent.getAction().getID();
-
-                    if (actionId == SVNEventAction.COMMIT_ADDED.getID()) {
-                        addedFiles.add(paramSVNEvent.getFile().getPath());
-                    } else if (actionId == SVNEventAction.COMMIT_DELETED.getID()) {
-                        deletedFiles.add(paramSVNEvent.getFile().getPath());
-                    } else if (actionId == SVNEventAction.COMMIT_MODIFIED.getID()) {
-                        mergedFiles.add(paramSVNEvent.getFile().getPath());
-                    } else if (actionId == SVNEventAction.COMMIT_REPLACED.getID()) {
-                        mergedFiles.add(paramSVNEvent.getFile().getPath());
-                        // else do nothing
-                    }
-                }
-            }
-        });
-
+        final ISVNNotifyListener listener = new DefaultNotifyListener() {
+        	 
+        	/* (non-Javadoc)
+			 * @see org.openengsb.connector.svn.commands.DefaultNotifyListener#onNotify(java.io.File, org.tigris.subversion.svnclientadapter.SVNNodeKind)
+			 */
+			@Override
+			public void onNotify(File file, SVNNodeKind kind) {
+				super.onNotify(file, kind);
+				
+				// TODO distinct add, delete and merge
+				if(kind.equals(SVNNodeKind.FILE)) {
+					mergedFiles.add(file.getPath());
+				}
+			}
+        };
+        getClient().addNotifyListener(listener);
+        
         try {
             // perform call
-            SVNCommitInfo info = client.doCommit(paths, keepLocks, commitMessage, properties, changelists,
-                    keepChangelist, force, depth);
-
+            long revisionId = getClient().commit(paths, commitMessage, true);
+            
             // set up and fill result
             MergeResult result = new MergeResult();
             result.setAdds(addedFiles.toArray(new String[addedFiles.size()]));
             result.setDeletions(deletedFiles.toArray(new String[deletedFiles.size()]));
             result.setMerges(mergedFiles.toArray(new String[mergedFiles.size()]));
-            result.setRevision(String.valueOf(info.getNewRevision()));
+            result.setRevision(String.valueOf(revisionId));
 
             // TODO find out how to collect conflicting files...
             // conflicting files are reported in errormessages and therefore
             // should be treated as error in SVN
-            if (info.getErrorMessage() != null) {
-                throw new ScmException(info.getErrorMessage().getFullMessage());
-            } else {
-                return result;
-            }
-        } catch (SVNException exception) {
+            return result;
+            
+        } catch (SVNClientException exception) {
             throw new ScmException(exception);
+        } finally {
+            // unregister listener
+            getClient().removeNotifyListener(listener);
         }
     }
 

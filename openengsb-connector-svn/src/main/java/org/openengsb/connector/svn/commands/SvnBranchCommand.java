@@ -20,12 +20,6 @@ package org.openengsb.connector.svn.commands;
 import org.openengsb.scm.common.commands.BranchCommand;
 import org.openengsb.scm.common.commands.Command;
 import org.openengsb.scm.common.exceptions.ScmException;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNProperties;
-import org.tmatesoft.svn.core.SVNURL;
-import org.tmatesoft.svn.core.wc.SVNCopyClient;
-import org.tmatesoft.svn.core.wc.SVNCopySource;
-import org.tmatesoft.svn.core.wc.SVNRevision;
 
 
 /**
@@ -40,42 +34,45 @@ public class SvnBranchCommand extends AbstractSvnCommand<Object> implements Bran
 
     @Override
     public Object execute() throws ScmException {
-        if (!canWriteToRepository()) {
-            throw new ScmException("Must not write to repository (set developerConnection to be able to do so)");
-        }
-
-        // check for TRUNK-keyword
-        if (AbstractSvnCommand.TRUNK_KEYWORD.equals(this.branchName)) {
-            throw new ScmException(AbstractSvnCommand.TRUNK_KEYWORD + " is not allowed as branch-name");
-        }
-
-        try {
-            // compute trunk and branch-url
-            SVNURL repositoryUrl = getRepositoryUrl();
-            SVNURL branchesUrl = repositoryUrl.appendPath(AbstractSvnCommand.BRANCHES, true);
-            SVNURL branchUrl = branchesUrl.appendPath(this.branchName, true);
-            SVNURL trunkUrl = repositoryUrl.appendPath(AbstractSvnCommand.TRUNK, true);
-
-            // set up client and parameters
-            SVNCopyClient client = getClientManager().getCopyClient();
-            SVNRevision revision = SVNRevision.HEAD;
-            SVNCopySource[] sources = new SVNCopySource[] { new SVNCopySource(revision, revision, trunkUrl) };
-            boolean isMove = false;
-            boolean makeParents = true; // let's stay fault tolerant
-            boolean failWhenDestinationExists = true; // ... but still not
-            // overwrite anything
-            // silently
-            SVNProperties revisionProperties = null;
-
-            // execute copy
-            client.doCopy(sources, branchUrl, isMove, makeParents, failWhenDestinationExists, this.commitMessage,
-                    revisionProperties);
-        } catch (SVNException exception) {
-            throw new ScmException(exception);
-        }
-
-        // return dummy null-value
-        return null;
+    	// TODO implement via client adapter
+    	throw new ScmException("not implemented yet");
+    	
+//        if (!canWriteToRepository()) {
+//            throw new ScmException("Must not write to repository (set developerConnection to be able to do so)");
+//        }
+//
+//        // check for TRUNK-keyword
+//        if (AbstractSvnCommand.TRUNK_KEYWORD.equals(this.branchName)) {
+//            throw new ScmException(AbstractSvnCommand.TRUNK_KEYWORD + " is not allowed as branch-name");
+//        }
+//
+//        try {
+//            // compute trunk and branch-url
+//            SVNURL repositoryUrl = getRepositoryUrl();
+//            SVNURL branchesUrl = repositoryUrl.appendPath(AbstractSvnCommand.BRANCHES, true);
+//            SVNURL branchUrl = branchesUrl.appendPath(this.branchName, true);
+//            SVNURL trunkUrl = repositoryUrl.appendPath(AbstractSvnCommand.TRUNK, true);
+//
+//            // set up client and parameters
+//            SVNCopyClient client = getClientManager().getCopyClient();
+//            SVNRevision revision = SVNRevision.HEAD;
+//            SVNCopySource[] sources = new SVNCopySource[] { new SVNCopySource(revision, revision, trunkUrl) };
+//            boolean isMove = false;
+//            boolean makeParents = true; // let's stay fault tolerant
+//            boolean failWhenDestinationExists = true; // ... but still not
+//            // overwrite anything
+//            // silently
+//            SVNProperties revisionProperties = null;
+//
+//            // execute copy
+//            client.doCopy(sources, branchUrl, isMove, makeParents, failWhenDestinationExists, this.commitMessage,
+//                    revisionProperties);
+//        } catch (SVNException exception) {
+//            throw new ScmException(exception);
+//        }
+//
+//        // return dummy null-value
+//        return null;
     }
 
     @Override

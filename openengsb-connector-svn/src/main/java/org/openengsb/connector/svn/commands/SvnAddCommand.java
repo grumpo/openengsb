@@ -22,9 +22,7 @@ import java.io.File;
 import org.openengsb.scm.common.commands.AddCommand;
 import org.openengsb.scm.common.commands.Command;
 import org.openengsb.scm.common.exceptions.ScmException;
-import org.tmatesoft.svn.core.SVNDepth;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.wc.SVNWCClient;
+import org.tigris.subversion.svnclientadapter.SVNClientException;
 
 
 /**
@@ -37,17 +35,10 @@ public class SvnAddCommand extends AbstractSvnCommand<Object> implements AddComm
 
     @Override
     public Object execute() throws ScmException {
-        // set up client
-        SVNWCClient client = getClientManager().getWCClient();
 
         // set up parameters
         File fileToAdd = new File(getWorkingCopy(), this.fileToAdd);
-        boolean force = false;
-        boolean mkdir = fileToAdd.isDirectory();
-        boolean climbUnversionedParents = true;
-        SVNDepth depth = SVNDepth.INFINITY;
-        boolean includeIgnored = false;
-        boolean makeParents = fileToAdd.isDirectory();
+        boolean isDir = fileToAdd.isDirectory();
 
         // sanity checks
         if (!fileToAdd.exists()) {
@@ -61,8 +52,12 @@ public class SvnAddCommand extends AbstractSvnCommand<Object> implements AddComm
 
         // actual call to SVNKit
         try {
-            client.doAdd(fileToAdd, force, mkdir, climbUnversionedParents, depth, includeIgnored, makeParents);
-        } catch (SVNException exception) {
+        	if(isDir) {
+                getClient().addDirectory(fileToAdd, true);
+        	} else {
+                getClient().addFile(fileToAdd);
+        	}
+        } catch (SVNClientException exception) {
             throw new ScmException(exception);
         }
 

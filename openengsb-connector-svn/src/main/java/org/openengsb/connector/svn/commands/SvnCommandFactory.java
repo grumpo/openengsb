@@ -32,10 +32,6 @@ import org.openengsb.scm.common.commands.LogCommand;
 import org.openengsb.scm.common.commands.MergeCommand;
 import org.openengsb.scm.common.commands.SwitchBranchCommand;
 import org.openengsb.scm.common.commands.UpdateCommand;
-import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
-import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
-import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
-import org.tmatesoft.svn.core.wc.SVNClientManager;
 
 
 /**
@@ -45,7 +41,6 @@ import org.tmatesoft.svn.core.wc.SVNClientManager;
  * are passed in AbstractCommandFactory.
  */
 public class SvnCommandFactory extends AbstractScmCommandFactory {
-    private static SVNClientManager clientManager = null;
 
     /* AbstractCommandFactory implementation */
 
@@ -181,52 +176,19 @@ public class SvnCommandFactory extends AbstractScmCommandFactory {
 
     /**
      * Initializes the library to work with a repository via different
-     * protocols. Copied from {@link http
-     * ://svn.svnkit.com/repos/svnkit/tags/1.1.8
-     * /doc/examples/src/org/tmatesoft/svn/examples/wc/WorkingCopy.java}
+     * protocols.
      */
     private static void setupLibrary() {
-        /*
-         * For using over http:// and https://
-         */
-        DAVRepositoryFactory.setup();
-        /*
-         * ile);
-         * 
-         * /** Returns a Command that annotates each line of a file's content
-         * with additional data (revision and author of last modification) and
-         * returns the content. This call equals <code>getBlameCommand (file,
-         * null);</code>
-         * 
-         * @param file The path to the file to be blamed. For using over svn://
-         * and svn+xxx://
-         */
-        SVNRepositoryFactoryImpl.setup();
-        /*
-         * For using over file:///
-         */
-        FSRepositoryFactory.setup();
+        // TODO implement via client adapter
     }
 
-    private void init() {
+    protected void init() {
         setupLibrary();
-        SvnCommandFactory.clientManager = SVNClientManager.newInstance();
-    }
-
-    private SVNClientManager getClientManager() {
-        if (SvnCommandFactory.clientManager == null) {
-            init();
-        }
-
-        return SvnCommandFactory.clientManager;
     }
 
     private void setUpCommand(AbstractSvnCommand<?> command) {
         // set scm-specific parameters
         setScmParameters(command);
-
-        // set svn-specific parameters
-        command.setClientManager(getClientManager());
     }
 
     /* end helpers */
