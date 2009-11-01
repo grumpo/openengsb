@@ -79,26 +79,11 @@
       <artifactId>openengsb-domain-scm-common</artifactId>
     </dependency>
 
-    <!-- SVNKit Dependencies -->
+    <!-- Subversion Dependencies -->
     <dependency>
-      <groupId>org.tmatesoft</groupId>
-      <artifactId>jna</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.tmatesoft</groupId>
-      <artifactId>svnkit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.tmatesoft</groupId>
-      <artifactId>svnkit-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.tmatesoft</groupId>
-      <artifactId>svnkit-javahl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.tmatesoft</groupId>
-      <artifactId>trilead</artifactId>
+      <groupId>org.tigris.subversion</groupId>
+      <artifactId>clientadapter</artifactId>
+      <version>${subversion.version}</version>
     </dependency>
 
     <!-- Servicemix dependencies -->
