@@ -27,8 +27,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.rmi.RemoteException;
 
-import org.openengsb.util.IO;
-
 import scala.tools.nsc.Interpreter;
 import scala.tools.nsc.Settings;
 import scala.tools.nsc.InterpreterResults.Result;
@@ -102,7 +100,7 @@ public class ScalaExecutor {
         } catch (IOException e) {
             System.out.println("I/O Error");
         } finally {
-            IO.closeQuietly(reader);
+            // IO.closeQuietly(reader);
         }
 
         return null;
