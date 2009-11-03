@@ -83,7 +83,6 @@
     <module>openengsb-timing</module>
     <module>openengsb-routing</module>
     <module>openengsb-logging</module>
-    <module>openengsb-logging-evil</module>
     <module>openengsb-util</module>
         
     <!-- Engineering Knowledge Base -->
@@ -503,11 +502,6 @@
       <dependency>
         <groupId>org.openengsb</groupId>
         <artifactId>openengsb-logging</artifactId>
-        <version>${pom.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.openengsb</groupId>
-        <artifactId>openengsb-logging-evil</artifactId>
         <version>${pom.version}</version>
       </dependency>
       <dependency>
