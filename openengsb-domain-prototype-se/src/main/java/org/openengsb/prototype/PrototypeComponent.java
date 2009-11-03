@@ -22,8 +22,9 @@ import java.util.List;
 import org.apache.servicemix.common.DefaultComponent;
 
 /**
- * @org.apache.xbean.XBean element="prototypeComponent" description="SVN Component"
- *                         The SCM-component
+ * @org.apache.xbean.XBean element="prototypeComponent"
+ *                         description="Prototype Component" The
+ *                         Prototype-component
  */
 public class PrototypeComponent extends DefaultComponent {
     private PrototypeEndpoint[] endpoints;

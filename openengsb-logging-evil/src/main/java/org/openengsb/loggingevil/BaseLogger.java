@@ -19,7 +19,6 @@ package org.openengsb.loggingevil;
 
 import javax.annotation.Resource;
 import javax.jbi.messaging.DeliveryChannel;
-import javax.jbi.messaging.ExchangeStatus;
 import javax.jbi.messaging.MessageExchange;
 import javax.jbi.messaging.MessagingException;
 
