@@ -63,7 +63,6 @@ public class Router {
         ScriptResult scriptResult = new ScriptResult();
         ScalaExecutor scala = new ScalaExecutor();
         scala.bind("id", String.class, id);
-        scala.bind("msg", String.class, inMessage);
         scala.bind("config", String.class, config);
         scala.bind("scriptResult", ScriptResult.class, scriptResult);
         scala.execute(new File(SCRIPT_PATH + "openengsb-dsl.scala"));
@@ -71,7 +70,7 @@ public class Router {
 
         NormalizedMessage outMessage = new NormalizedMessageImpl();
         try {
-            inMessage.setContent(new StringSource(scriptResult.getResult()));
+            outMessage.setContent(new StringSource(scriptResult.getResult()));
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
@@ -129,9 +128,13 @@ public class Router {
 
     public static void main(String[] args) throws IOException {
         Router router = new Router();
-        NormalizedMessage inMessage = null;
+
+        NormalizedMessageImpl inMessage = new NormalizedMessageImpl();
+        inMessage.setContent(new StringSource(
+                "<message id=\"42\"><payload><timer><name>Foo</name><group>Bar</group></timer></payload></message>"));
+
         NormalizedMessage outMessage = router.route(inMessage);
         System.out.println("Result is: " + outMessage);
+        System.out.println(outMessage.getContent());
     }
-
 }
