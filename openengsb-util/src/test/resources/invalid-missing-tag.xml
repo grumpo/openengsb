@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--
-
+/**
    Copyright 2009 OpenEngSB Division, Vienna University of Technology
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +13,16 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+ */
 
--->
-<?xml version="1.0" encoding="UTF-8"?>
-<sampleMessage xmlns="http://engsb.ifs.tuwien.ac.at/SampleMessage" xmlns:xsi="http://www.w3.org/2001/XMLSchema"
-  xsi:schemaLocation="http://engsb.ifs.tuwien.ac.at/SampleMessage http://engsb.ifs.tuwien.ac.at/sample-message.xsd">
-  <first>
-    a test string
-    <last>2009-10-02T23:42:31</last>
-</sampleMessage>
+import org.openengsb.routingspike.ScmAdapter
+import org.openengsb.routingspike.Lookup
+
+def scm(name: String) : ScmAdapter = {
+	new Lookup(config).getScm(name)
+}
+
+def result(res: String) {
+	scriptResult.setResult(res)
+	}
+
