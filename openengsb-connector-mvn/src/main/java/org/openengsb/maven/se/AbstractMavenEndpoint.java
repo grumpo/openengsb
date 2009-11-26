@@ -42,6 +42,8 @@ import org.openengsb.maven.common.pojos.LogLevelMaven;
 import org.openengsb.maven.common.pojos.Options;
 import org.openengsb.maven.common.pojos.ProjectConfiguration;
 import org.openengsb.maven.common.pojos.result.MavenResult;
+import org.openengsb.util.serialization.JibxXmlSerializer;
+import org.openengsb.util.serialization.Serializer;
 
 public class AbstractMavenEndpoint extends ProviderEndpoint {
 
@@ -57,6 +59,12 @@ public class AbstractMavenEndpoint extends ProviderEndpoint {
     protected Date buildStartTime;
     protected Date buildEndTime;
     protected boolean settingsDefinied;
+
+    protected Serializer serializer;
+
+    public AbstractMavenEndpoint() {
+        this.serializer = new JibxXmlSerializer();
+    }
 
     /**
      * Executes the given Maven goals in the given directory.

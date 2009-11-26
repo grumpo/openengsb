@@ -85,6 +85,12 @@
 
   <dependencies>
 
+    <!-- openengsb dependencies -->
+    <dependency>
+      <groupId>org.openengsb</groupId>
+      <artifactId>openengsb-util</artifactId>
+    </dependency>
+
     <!-- util dependencies -->
     <dependency>
       <groupId>commons-io</groupId>

@@ -18,25 +18,34 @@
 
 package org.openengsb.maven.serializer;
 
-import javax.xml.transform.Source;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URISyntaxException;
+
 import javax.xml.transform.TransformerException;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.servicemix.jbi.jaxp.SourceTransformer;
-import org.apache.servicemix.jbi.jaxp.StringSource;
+import org.apache.commons.io.FileUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openengsb.maven.common.exceptions.SerializationException;
+import org.openengsb.maven.common.messages.InstallFileMessage;
 import org.openengsb.maven.common.pojos.InstallFileDescriptor;
-import org.openengsb.maven.common.serializer.InstallFileDescriptorSerializer;
+import org.openengsb.util.serialization.JibxXmlSerializer;
+import org.openengsb.util.serialization.SerializationException;
+import org.openengsb.util.serialization.Serializer;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/testbeans.xml" })
-public class InstallFileDescriptorSerializerTest extends TestCase {
+public class InstallFileMessageSerializerTest extends TestCase {
 
     final String validMessageTemplate = "<mavenFileInstaller fileToInstall=\"%s\" groupId=\"%s\" artifactId=\"%s\" version=\"%s\" packaging=\"%s\"/>";
     final String invalidMessageTemplate = "<mavenFileInstallerInvalid fileToInstallInvalid=\"\" groupIdInvalid=\"\" artifactIdInvalid=\"\" versionInvalid=\"\" packagingInvalid=\"\"/>";
@@ -47,36 +56,43 @@ public class InstallFileDescriptorSerializerTest extends TestCase {
     final String version = "myversion1.0";
     final String packaging = "jar";
 
+    private Serializer serializer;
+
+    @Before
+    public void setup() {
+        this.serializer = new JibxXmlSerializer();
+    }
+
     @Test
-    public void serializeValidDescriptorShouldSucceed() throws TransformerException, SerializationException {
+    public void serializeValidDescriptorShouldSucceed() throws TransformerException, SerializationException,
+            URISyntaxException, IOException {
+        File validFile = new File(ClassLoader.getSystemResource("valid-installfilemessage.xml").toURI());
         InstallFileDescriptor descriptor = new InstallFileDescriptor(this.filePath, this.groupId, this.artifactId,
                 this.version, this.packaging);
+        InstallFileMessage msg = new InstallFileMessage(descriptor);
 
-        Source source = InstallFileDescriptorSerializer.serialize(descriptor);
+        StringWriter sw = new StringWriter();
+        serializer.serialize(msg, sw);
 
-        Assert.assertNotNull(source);
-
-        SourceTransformer transformer = new SourceTransformer();
-        String deserializedMessage = transformer.toString(source);
-
-        Assert.assertEquals(String.format("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + this.validMessageTemplate,
-                this.filePath, this.groupId, this.artifactId, this.version, this.packaging), deserializedMessage);
+        assertEquals(getWhitespaceAdjustedTextFromFile(validFile), sw.toString());
     }
 
     @Test(expected = SerializationException.class)
     public void serializeInvalidDescriptorShouldThrowSerializationException() throws SerializationException {
         InstallFileDescriptor descriptor = new InstallFileDescriptor(null, this.groupId, this.artifactId, this.version,
                 this.packaging);
-        InstallFileDescriptorSerializer.serialize(descriptor);
+        InstallFileMessage msg = new InstallFileMessage(descriptor);
+        serializer.serialize(msg, new StringWriter());
     }
 
     @Test
-    public void deserializeValidSourceShouldSucceed() throws SerializationException {
-        Source validSource = new StringSource(String.format(this.validMessageTemplate, this.filePath, this.groupId,
-                this.artifactId,
-                this.version, this.packaging));
+    public void deserializeValidInputShouldSucceed() throws SerializationException, URISyntaxException,
+            FileNotFoundException {
+        File validFile = new File(ClassLoader.getSystemResource("valid-installfilemessage.xml").toURI());
 
-        InstallFileDescriptor descriptor = InstallFileDescriptorSerializer.deserialize(validSource);
+        InstallFileMessage msg = serializer.deserialize(InstallFileMessage.class, new FileReader(validFile));
+
+        InstallFileDescriptor descriptor = msg.getFileDescriptor();
 
         Assert.assertNotNull(descriptor);
         Assert.assertEquals(this.filePath, descriptor.getFilePath());
@@ -88,9 +104,12 @@ public class InstallFileDescriptorSerializerTest extends TestCase {
 
     @Test(expected = SerializationException.class)
     public void deserializeInvalidSourceShouldThrowSerializationException() throws SerializationException {
-        Source invalidSource = new StringSource(this.invalidMessageTemplate);
+        serializer.deserialize(InstallFileMessage.class, new StringReader(this.invalidMessageTemplate));
+    }
 
-        InstallFileDescriptorSerializer.deserialize(invalidSource);
+    private String getWhitespaceAdjustedTextFromFile(File file) throws IOException {
+        return FileUtils.readFileToString(file).replaceAll("\n", "").replaceAll(">\\s*<", "><").replaceAll("<!--.*-->",
+                "");
     }
 
 }

@@ -18,6 +18,7 @@
 
 package org.openengsb.maven.installfile;
 
+import java.io.StringWriter;
 import java.util.List;
 
 import javax.jbi.messaging.ExchangeStatus;
@@ -35,10 +36,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openengsb.maven.common.messages.InstallFileMessage;
 import org.openengsb.maven.common.pojos.InstallFileDescriptor;
 import org.openengsb.maven.common.pojos.result.MavenResult;
-import org.openengsb.maven.common.serializer.InstallFileDescriptorSerializer;
 import org.openengsb.maven.common.serializer.MavenResultSerializer;
+import org.openengsb.util.serialization.JibxXmlSerializer;
+import org.openengsb.util.serialization.Serializer;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -56,6 +59,7 @@ public class MavenInstallFileIntegrationTest extends SpringTestSupport {
     private static final String xbean = "spring-test-xbean-installfile.xml";
     private static final String testNamespace = "urn:test";
     private static final String serviceName = "fileInstallerService";
+    private static Serializer serializer = new JibxXmlSerializer();
 
     @Before
     public void setUp() throws Exception {
@@ -84,8 +88,10 @@ public class MavenInstallFileIntegrationTest extends SpringTestSupport {
     @Test
     public void successfulRunShouldReturnPositiveResult() throws Exception {
         DefaultServiceMixClient client = new DefaultServiceMixClient(jbi);
-        InOut messageExchange = createInOutMessage(client, serviceName, InstallFileDescriptorSerializer
-                .serialize(new InstallFileDescriptor(validFilePath, groupId, artifactId, version, packaging)));
+        StringWriter sw = new StringWriter();
+        serializer.serialize(new InstallFileMessage(new InstallFileDescriptor(validFilePath, groupId, artifactId,
+                version, packaging)), sw);
+        InOut messageExchange = createInOutMessage(client, serviceName, new StringSource(sw.toString()));
         client.sendSync(messageExchange);
 
         validateReturnMessage(messageExchange);
@@ -101,8 +107,10 @@ public class MavenInstallFileIntegrationTest extends SpringTestSupport {
     @Test
     public void runWithNonExistingFilePathShouldReturnError() throws Exception {
         DefaultServiceMixClient client = new DefaultServiceMixClient(jbi);
-        InOut messageExchange = createInOutMessage(client, serviceName, InstallFileDescriptorSerializer
-                .serialize(new InstallFileDescriptor(invalidFilePath, groupId, artifactId, version, packaging)));
+        StringWriter sw = new StringWriter();
+        serializer.serialize(new InstallFileMessage(new InstallFileDescriptor(invalidFilePath, groupId, artifactId,
+                version, packaging)), sw);
+        InOut messageExchange = createInOutMessage(client, serviceName, new StringSource(sw.toString()));
         client.sendSync(messageExchange);
 
         validateReturnMessage(messageExchange);
@@ -132,15 +140,17 @@ public class MavenInstallFileIntegrationTest extends SpringTestSupport {
         assertEquals(MavenResult.ERROR, result.getMavenOutput());
         assertEquals("An error occurred deserializing the incoming message.", result.getErrorMessage());
         assertEquals(1, result.getExceptions().size());
-        assertEquals("Not all expected attributes could be found.", result.getExceptions().get(0).getMessage());
+        assertEquals("Error deserializing from reader.", result.getExceptions().get(0).getMessage());
     }
 
     @Test
     public void runWithInvalidParametersShouldReturnError() throws Exception {
         DefaultServiceMixClient client = new DefaultServiceMixClient(jbi);
 
-        InOut messageExchange = createInOutMessage(client, serviceName, new StringSource(
-                "<mavenFileInstaller fileToInstall=\"\" groupId=\"\" artifactId=\"\" version=\"\" packaging=\"\"/>"));
+        StringWriter sw = new StringWriter();
+        serializer.serialize(new InstallFileMessage(new InstallFileDescriptor("", "", "", "", "")), sw);
+        InOut messageExchange = createInOutMessage(client, serviceName, new StringSource(sw.toString()));
+
         client.sendSync(messageExchange);
 
         validateReturnMessage(messageExchange);

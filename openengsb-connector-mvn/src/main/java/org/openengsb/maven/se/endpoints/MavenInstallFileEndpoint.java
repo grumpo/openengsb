@@ -19,6 +19,8 @@
 package org.openengsb.maven.se.endpoints;
 
 import java.io.File;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -26,17 +28,22 @@ import java.util.Properties;
 import javax.jbi.messaging.ExchangeStatus;
 import javax.jbi.messaging.MessageExchange;
 import javax.jbi.messaging.NormalizedMessage;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.maven.wagon.PathUtils;
 import org.openengsb.maven.common.domains.InstallFileDomain;
 import org.openengsb.maven.common.exceptions.MavenException;
-import org.openengsb.maven.common.exceptions.SerializationException;
+import org.openengsb.maven.common.messages.InstallFileMessage;
 import org.openengsb.maven.common.pojos.InstallFileDescriptor;
 import org.openengsb.maven.common.pojos.Options;
 import org.openengsb.maven.common.pojos.result.MavenResult;
-import org.openengsb.maven.common.serializer.InstallFileDescriptorSerializer;
 import org.openengsb.maven.common.serializer.MavenResultSerializer;
 import org.openengsb.maven.se.AbstractMavenEndpoint;
+import org.openengsb.util.serialization.SerializationException;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
@@ -55,7 +62,9 @@ public class MavenInstallFileEndpoint extends AbstractMavenEndpoint implements I
 
         List<MavenResult> resultList = new ArrayList<MavenResult>();
         try {
-            InstallFileDescriptor descriptor = InstallFileDescriptorSerializer.deserialize(in.getContent());
+            InstallFileMessage msg = serializer.deserialize(InstallFileMessage.class, new StringReader(
+                    transformMessageToString(in)));
+            InstallFileDescriptor descriptor = msg.getFileDescriptor();
 
             MavenResult installResult = installFile(descriptor);
 
@@ -109,5 +118,13 @@ public class MavenInstallFileEndpoint extends AbstractMavenEndpoint implements I
 
     public void setOptions(Options options) {
         this.options = options;
+    }
+
+    private String transformMessageToString(NormalizedMessage msg) throws TransformerFactoryConfigurationError,
+            TransformerException {
+        Transformer messageTransformer = TransformerFactory.newInstance().newTransformer();
+        StringWriter stringWriter = new StringWriter();
+        messageTransformer.transform(msg.getContent(), new StreamResult(stringWriter));
+        return stringWriter.toString();
     }
 }
