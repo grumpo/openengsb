@@ -41,8 +41,7 @@ public class InstallFileDescriptor {
 
     }
 
-    public InstallFileDescriptor(String filePath, String groupId,
-            String artifactId, String version, String packaging) {
+    public InstallFileDescriptor(String filePath, String groupId, String artifactId, String version, String packaging) {
         this.filePath = filePath;
         this.groupId = groupId;
         this.artifactId = artifactId;
@@ -91,13 +90,25 @@ public class InstallFileDescriptor {
     }
 
     public boolean validate() {
-        return (!isNullOrEmpty(this.filePath) && !isNullOrEmpty(this.groupId)
-                && !isNullOrEmpty(this.artifactId) && !isNullOrEmpty(this.version)
-                && !isNullOrEmpty(this.packaging) && ArrayUtils.contains(
+        return (!isNullOrEmpty(this.filePath) && !isNullOrEmpty(this.groupId) && !isNullOrEmpty(this.artifactId)
+                && !isNullOrEmpty(this.version) && !isNullOrEmpty(this.packaging) && ArrayUtils.contains(
                 VALID_PACKAGING_TYPES, this.packaging));
     }
 
     private boolean isNullOrEmpty(String s) {
         return (s == null || s.equals(""));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof InstallFileDescriptor)) {
+            return false;
+        }
+
+        InstallFileDescriptor other = (InstallFileDescriptor) obj;
+
+        return this.filePath.equals(other.getFilePath()) && this.groupId.equals(other.getGroupId())
+                && this.artifactId.equals(other.getArtifactId()) && this.version.equals(other.getVersion())
+                && this.packaging.equals(other.getPackaging());
     }
 }

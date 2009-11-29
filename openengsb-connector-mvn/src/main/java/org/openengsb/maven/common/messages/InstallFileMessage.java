@@ -39,4 +39,14 @@ public class InstallFileMessage {
         this.fileDescriptor = fileDescriptor;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof InstallFileMessage)) {
+            return false;
+        }
+
+        InstallFileMessage other = (InstallFileMessage) obj;
+
+        return this.fileDescriptor.equals(other.getFileDescriptor());
+    }
 }
