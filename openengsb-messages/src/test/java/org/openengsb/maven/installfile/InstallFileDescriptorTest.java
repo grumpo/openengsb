@@ -22,7 +22,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.openengsb.maven.common.pojos.InstallFileDescriptor;
+import org.openengsb.messages.maven.InstallFileDescriptor;
 
 public class InstallFileDescriptorTest {
 

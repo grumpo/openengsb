@@ -37,12 +37,12 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.maven.wagon.PathUtils;
 import org.openengsb.maven.common.domains.InstallFileDomain;
 import org.openengsb.maven.common.exceptions.MavenException;
-import org.openengsb.maven.common.messages.InstallFileMessage;
-import org.openengsb.maven.common.pojos.InstallFileDescriptor;
 import org.openengsb.maven.common.pojos.Options;
 import org.openengsb.maven.common.pojos.result.MavenResult;
 import org.openengsb.maven.common.serializer.MavenResultSerializer;
 import org.openengsb.maven.se.AbstractMavenEndpoint;
+import org.openengsb.messages.maven.InstallFileDescriptor;
+import org.openengsb.messages.maven.InstallFileMessage;
 import org.openengsb.util.serialization.SerializationException;
 
 import edu.emory.mathcs.backport.java.util.Arrays;

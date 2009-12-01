@@ -16,9 +16,7 @@
    
  */
 
-package org.openengsb.maven.common.messages;
-
-import org.openengsb.maven.common.pojos.InstallFileDescriptor;
+package org.openengsb.messages.maven;
 
 public class InstallFileMessage {
     private InstallFileDescriptor fileDescriptor;

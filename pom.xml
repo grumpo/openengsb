@@ -149,6 +149,7 @@
     <module>openengsb-config-jbi</module>
     <module>openengsb-config-ui</module>
     <module>openengsb-embedded</module>
+    <module>openengsb-messages</module>
   </modules>
 
   <inceptionYear>2009</inceptionYear>
@@ -566,6 +567,11 @@
       <dependency>
         <groupId>org.openengsb</groupId>
         <artifactId>openengsb-util</artifactId>
+        <version>${pom.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openengsb</groupId>
+        <artifactId>openengsb-messages</artifactId>
         <version>${pom.version}</version>
       </dependency>
         

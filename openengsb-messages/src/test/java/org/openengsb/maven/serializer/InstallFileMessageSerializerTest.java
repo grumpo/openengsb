@@ -18,6 +18,8 @@
 
 package org.openengsb.maven.serializer;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -34,18 +36,13 @@ import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.openengsb.maven.common.messages.InstallFileMessage;
-import org.openengsb.maven.common.pojos.InstallFileDescriptor;
+import org.openengsb.messages.maven.InstallFileDescriptor;
+import org.openengsb.messages.maven.InstallFileMessage;
 import org.openengsb.util.serialization.JibxXmlSerializer;
 import org.openengsb.util.serialization.SerializationException;
 import org.openengsb.util.serialization.Serializer;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/testbeans.xml" })
-public class InstallFileMessageSerializerTest extends TestCase {
+public class InstallFileMessageSerializerTest {
 
     final String validMessageTemplate = "<mavenFileInstaller fileToInstall=\"%s\" groupId=\"%s\" artifactId=\"%s\" version=\"%s\" packaging=\"%s\"/>";
     final String invalidMessageTemplate = "<mavenFileInstallerInvalid fileToInstallInvalid=\"\" groupIdInvalid=\"\" artifactIdInvalid=\"\" versionInvalid=\"\" packagingInvalid=\"\"/>";

@@ -16,7 +16,7 @@
    
  */
 
-package org.openengsb.maven.common.pojos;
+package org.openengsb.messages.maven;
 
 import org.apache.commons.lang.ArrayUtils;
 

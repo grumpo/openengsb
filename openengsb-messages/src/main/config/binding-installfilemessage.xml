@@ -18,7 +18,7 @@
 <binding xmlns:tns="http://org.openengsb/connector/mvn/messages" name="binding"
   package="org.openengsb.maven.common.messages">
   <namespace uri="http://org.openengsb/connector/mvn/messages" default="elements" />
-  <mapping class="org.openengsb.maven.common.messages.InstallFileMessage" name="installfilemessage">
+  <mapping class="org.openengsb.messages.maven.InstallFileMessage" name="installfilemessage">
     <structure name="filedescriptor" field="fileDescriptor">
       <value name="filepath" field="filePath" />
       <value name="groupid" field="groupId" />
