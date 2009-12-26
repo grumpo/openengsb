@@ -82,7 +82,6 @@ public class MavenInstallFileEndpoint extends AbstractMavenEndpoint implements I
         }
 
         out.setContent(MavenResultSerializer.serialize(out.getContent(), resultList));
-        getChannel().send(exchange);
     }
 
     @SuppressWarnings("unchecked")
