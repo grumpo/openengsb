@@ -33,9 +33,9 @@ import org.apache.servicemix.jbi.jaxp.SourceTransformer;
 import org.apache.xpath.CachedXPathAPI;
 import org.openengsb.maven.common.domains.DeployDomain;
 import org.openengsb.maven.common.exceptions.MavenException;
-import org.openengsb.maven.common.pojos.result.MavenResult;
 import org.openengsb.maven.common.serializer.MavenResultSerializer;
 import org.openengsb.maven.se.AbstractMavenEndpoint;
+import org.openengsb.messages.maven.MavenResult;
 import org.w3c.dom.Node;
 
 

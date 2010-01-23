@@ -16,7 +16,7 @@
    
  */
 
-package org.openengsb.maven.common.pojos.result;
+package org.openengsb.messages.maven;
 
 import java.util.List;
 

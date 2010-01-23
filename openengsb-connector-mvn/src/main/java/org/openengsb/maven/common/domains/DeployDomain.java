@@ -21,7 +21,7 @@ package org.openengsb.maven.common.domains;
 import java.util.List;
 
 import org.openengsb.maven.common.exceptions.MavenException;
-import org.openengsb.maven.common.pojos.result.MavenResult;
+import org.openengsb.messages.maven.MavenResult;
 
 
 /**

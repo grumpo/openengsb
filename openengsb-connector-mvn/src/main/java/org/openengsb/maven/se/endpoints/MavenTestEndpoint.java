@@ -30,10 +30,10 @@ import javax.jbi.messaging.NormalizedMessage;
 import org.openengsb.maven.common.domains.BuildDomain;
 import org.openengsb.maven.common.domains.TestDomain;
 import org.openengsb.maven.common.exceptions.MavenException;
-import org.openengsb.maven.common.pojos.result.MavenResult;
 import org.openengsb.maven.common.serializer.MavenResultSerializer;
 import org.openengsb.maven.common.util.dom.DOMCreator;
 import org.openengsb.maven.se.AbstractMavenEndpoint;
+import org.openengsb.messages.maven.MavenResult;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 

@@ -31,7 +31,7 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.apache.servicemix.jbi.jaxp.SourceTransformer;
 import org.openengsb.maven.common.exceptions.SerializationException;
-import org.openengsb.maven.common.pojos.result.MavenResult;
+import org.openengsb.messages.maven.MavenResult;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

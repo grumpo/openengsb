@@ -39,9 +39,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openengsb.maven.common.domains.DeployDomain;
 import org.openengsb.maven.common.exceptions.MavenException;
-import org.openengsb.maven.common.pojos.result.MavenResult;
 import org.openengsb.maven.deploy.constants.DeployMvnTestConstants;
 import org.openengsb.maven.se.endpoints.MavenDeployEndpoint;
+import org.openengsb.messages.maven.MavenResult;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 

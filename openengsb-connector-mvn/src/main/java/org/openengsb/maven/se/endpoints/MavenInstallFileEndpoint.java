@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -34,15 +35,16 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.camel.converter.jaxp.StringSource;
 import org.apache.maven.wagon.PathUtils;
 import org.openengsb.maven.common.domains.InstallFileDomain;
 import org.openengsb.maven.common.exceptions.MavenException;
 import org.openengsb.maven.common.pojos.Options;
-import org.openengsb.maven.common.pojos.result.MavenResult;
 import org.openengsb.maven.common.serializer.MavenResultSerializer;
 import org.openengsb.maven.se.AbstractMavenEndpoint;
 import org.openengsb.messages.maven.InstallFileDescriptor;
 import org.openengsb.messages.maven.InstallFileMessage;
+import org.openengsb.messages.maven.MavenResult;
 import org.openengsb.util.serialization.SerializationException;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
@@ -60,17 +62,16 @@ public class MavenInstallFileEndpoint extends AbstractMavenEndpoint implements I
             return;
         }
 
-        List<MavenResult> resultList = new ArrayList<MavenResult>();
+        MavenResult result;
         try {
             InstallFileMessage msg = serializer.deserialize(InstallFileMessage.class, new StringReader(
                     transformMessageToString(in)));
             InstallFileDescriptor descriptor = msg.getFileDescriptor();
 
-            MavenResult installResult = installFile(descriptor);
-
-            resultList.add(installResult);
+            result = installFile(descriptor);
+            result.setFile(String.format("%s-%s.%s", descriptor.getArtifactId(), descriptor.getVersion(), descriptor.getPackaging()));
         } catch (SerializationException ex) {
-            MavenResult result = new MavenResult();
+            result = new MavenResult();
             result.setErrorMessage("An error occurred deserializing the incoming message.");
 
             List<Exception> exceptions = new ArrayList<Exception>();
@@ -78,10 +79,13 @@ public class MavenInstallFileEndpoint extends AbstractMavenEndpoint implements I
             result.setExceptions(exceptions);
 
             result.setMavenOutput(MavenResult.ERROR);
-            resultList.add(result);
         }
 
-        out.setContent(MavenResultSerializer.serialize(out.getContent(), resultList));
+        transferProperties(in, out);
+        
+        StringWriter sw = new StringWriter();
+        serializer.serialize(result, sw);
+        out.setContent(new StringSource(sw.toString()));
     }
 
     @SuppressWarnings("unchecked")
@@ -126,4 +130,19 @@ public class MavenInstallFileEndpoint extends AbstractMavenEndpoint implements I
         messageTransformer.transform(msg.getContent(), new StreamResult(stringWriter));
         return stringWriter.toString();
     }
+    
+    /**
+     * Transfers all properties from a given NormalizedMessagen to another
+     * NormalizedMessage.
+     * 
+     * @param from Source of property transfer
+     * @param to Target of property transfer
+     */
+    private void transferProperties(NormalizedMessage from, NormalizedMessage to) {
+        for (Iterator<String> iter = from.getPropertyNames().iterator(); iter.hasNext();) {
+            String currentPropertyName = iter.next();
+            to.setProperty(currentPropertyName, from.getProperty(currentPropertyName));
+        }
+    }
+
 }

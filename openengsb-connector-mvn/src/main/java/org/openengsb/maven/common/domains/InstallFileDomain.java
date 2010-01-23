@@ -19,8 +19,8 @@
 package org.openengsb.maven.common.domains;
 
 import org.openengsb.maven.common.exceptions.MavenException;
-import org.openengsb.maven.common.pojos.result.MavenResult;
 import org.openengsb.messages.maven.InstallFileDescriptor;
+import org.openengsb.messages.maven.MavenResult;
 
 /**
  * Interface describing the install-file domain.

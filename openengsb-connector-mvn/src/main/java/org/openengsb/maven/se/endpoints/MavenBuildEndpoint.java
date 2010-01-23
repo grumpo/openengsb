@@ -33,10 +33,10 @@ import org.openengsb.maven.common.exceptions.MavenException;
 import org.openengsb.maven.common.pojos.LogLevelMaven;
 import org.openengsb.maven.common.pojos.Options;
 import org.openengsb.maven.common.pojos.ProjectConfiguration;
-import org.openengsb.maven.common.pojos.result.MavenResult;
 import org.openengsb.maven.common.serializer.MavenResultSerializer;
 import org.openengsb.maven.common.serializer.ProjectConfigurationSerializer;
 import org.openengsb.maven.se.AbstractMavenEndpoint;
+import org.openengsb.messages.maven.MavenResult;
 
 
 /**

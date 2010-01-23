@@ -17,4 +17,5 @@
 -->
 <binding>
   <include path="binding-installfilemessage.xml" />
+  <include path="binding-mavenresult.xml" />
 </binding>
