@@ -13,7 +13,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-   
+
  */
 
 package org.openengsb.maven.se.endpoints;
@@ -35,26 +35,29 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.camel.converter.jaxp.StringSource;
+import org.apache.log4j.Logger;
 import org.apache.maven.wagon.PathUtils;
+import org.apache.servicemix.jbi.jaxp.StringSource;
 import org.openengsb.maven.common.domains.InstallFileDomain;
 import org.openengsb.maven.common.exceptions.MavenException;
 import org.openengsb.maven.common.pojos.Options;
-import org.openengsb.maven.common.serializer.MavenResultSerializer;
 import org.openengsb.maven.se.AbstractMavenEndpoint;
 import org.openengsb.messages.maven.InstallFileDescriptor;
 import org.openengsb.messages.maven.InstallFileMessage;
 import org.openengsb.messages.maven.MavenResult;
+import org.openengsb.util.serialization.JibxXmlSerializer;
 import org.openengsb.util.serialization.SerializationException;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * Endpoint implementing maven's install:install-file functionality.
- * 
+ *
  * @org.apache.xbean.XBean element="mavenFileInstaller"
  */
 public class MavenInstallFileEndpoint extends AbstractMavenEndpoint implements InstallFileDomain {
+
+	private Logger log = Logger.getLogger(MavenInstallFileEndpoint.class);
 
     @Override
     protected void processInOut(MessageExchange exchange, NormalizedMessage in, NormalizedMessage out) throws Exception {
@@ -71,8 +74,21 @@ public class MavenInstallFileEndpoint extends AbstractMavenEndpoint implements I
             result = installFile(descriptor);
             result.setFile(String.format("%s-%s.%s", descriptor.getArtifactId(), descriptor.getVersion(), descriptor.getPackaging()));
         } catch (SerializationException ex) {
+        	log.fatal("An error occurred deserializing the incoming message.", ex);
+
             result = new MavenResult();
             result.setErrorMessage("An error occurred deserializing the incoming message.");
+
+            List<Exception> exceptions = new ArrayList<Exception>();
+            exceptions.add(ex);
+            result.setExceptions(exceptions);
+
+            result.setMavenOutput(MavenResult.ERROR);
+        } catch (Exception ex) {
+        	log.fatal("An unexpected error occurred.", ex);
+
+        	result = new MavenResult();
+            result.setErrorMessage("An unexpected error occurred.");
 
             List<Exception> exceptions = new ArrayList<Exception>();
             exceptions.add(ex);
@@ -82,7 +98,7 @@ public class MavenInstallFileEndpoint extends AbstractMavenEndpoint implements I
         }
 
         transferProperties(in, out);
-        
+
         StringWriter sw = new StringWriter();
         serializer.serialize(result, sw);
         out.setContent(new StringSource(sw.toString()));
@@ -130,11 +146,11 @@ public class MavenInstallFileEndpoint extends AbstractMavenEndpoint implements I
         messageTransformer.transform(msg.getContent(), new StreamResult(stringWriter));
         return stringWriter.toString();
     }
-    
+
     /**
      * Transfers all properties from a given NormalizedMessagen to another
      * NormalizedMessage.
-     * 
+     *
      * @param from Source of property transfer
      * @param to Target of property transfer
      */
