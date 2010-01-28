@@ -1,0 +1,14 @@
+when
+  e : Event( name == "commit")
+then
+  String author = e.getValue("author");
+
+  Map emails = ctx.getAllValues("workflows/edbcommit/notification/email/");
+  Set emailSet = emails.keySet();
+  Iterator it = emailSet.iterator();
+  boolean hasNext = it.hasNext();
+  while(hasNext){
+    String test = it.next();
+    send(notification, author, test, "", "");
+    hasNext = it.hasNext();
+  }
