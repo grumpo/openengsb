@@ -13,7 +13,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-   
+
  */
 package org.openengsb.edb.jbi.endpoints;
 
@@ -24,15 +24,16 @@ import javax.jbi.messaging.NormalizedMessage;
 
 import org.apache.commons.logging.Log;
 import org.apache.servicemix.common.endpoints.ProviderEndpoint;
+import org.openengsb.core.endpoints.OpenEngSBEndpoint;
 import org.openengsb.edb.core.api.EDBHandlerFactory;
 import org.openengsb.edb.core.api.impl.DefaultEDBHandlerFactory;
 
 /**
  * An abstract ProviderEnpoint to be used by all endpoints that supply
  * functionality for EDB.
- * 
+ *
  */
-public abstract class AbstractEndpoint extends ProviderEndpoint {
+public abstract class AbstractEndpoint extends OpenEngSBEndpoint {
 
 	protected EDBHandlerFactory factory;
 	protected EDBEndPointConfig fullConfig;
@@ -116,7 +117,7 @@ public abstract class AbstractEndpoint extends ProviderEndpoint {
 	 * The default implementation just calls the super-method of processInOut
 	 * which in turn throws an Exception telling the caller, that this MEP is
 	 * not supported.
-	 * 
+	 *
 	 * @param exchange
 	 *            see {@link ProviderEndpoint#processInOut}
 	 * @param in
@@ -136,7 +137,7 @@ public abstract class AbstractEndpoint extends ProviderEndpoint {
 	 * The default implementation just calls the super-method of processInOut
 	 * which in turn throws an Exception telling the caller, that this MEP is
 	 * not supported.
-	 * 
+	 *
 	 * @param exchange
 	 *            see {@link ProviderEndpoint#processInOut}
 	 * @param in
@@ -155,7 +156,7 @@ public abstract class AbstractEndpoint extends ProviderEndpoint {
 	 * This method may seem not very useful, since logger is protected already
 	 * and could be accessed directly. It exists to change loggers easily. I.e.
 	 * to exchange the jbi-default-logger with a self-instantiated one.
-	 * 
+	 *
 	 * @return
 	 */
 	protected Log getLog() {
