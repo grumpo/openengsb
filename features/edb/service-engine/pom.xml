@@ -87,7 +87,7 @@
     </dependency>
     <dependency>
       <groupId>org.openengsb</groupId>
-      <artifactId>openengsb-workflow-drools-se</artifactId>
+      <artifactId>openengsb-workflow-se</artifactId>
     </dependency>
     <dependency>
       <groupId>org.openengsb</groupId>
