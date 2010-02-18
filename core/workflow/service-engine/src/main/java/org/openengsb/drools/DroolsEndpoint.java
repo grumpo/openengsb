@@ -13,7 +13,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-   
+
  */
 package org.openengsb.drools;
 
@@ -85,7 +85,7 @@ public class DroolsEndpoint extends SimpleEventEndpoint {
         QName loggingServiceIdentification = getLoggingServiceIdentification();
         loggingMessageExchange.setService(loggingServiceIdentification);
         loggingMessageExchange.setInMessage(messageToLog);
-        send(loggingMessageExchange);
+        //send(loggingMessageExchange);
     }
 
     private QName getLoggingServiceIdentification() {
@@ -120,7 +120,7 @@ public class DroolsEndpoint extends SimpleEventEndpoint {
 
     /**
      * handle the MessageExchange with drools.
-     * 
+     *
      * @param e2 exchange to handle
      */
     protected void drools(Event e, MessageProperties msgProperties) {
