@@ -61,7 +61,7 @@
         </sm:component>
       </sm:activationSpec>
 
-      <!-- <sm:activationSpec>
+      <sm:activationSpec>
         <sm:component>
           <notification:notificationComponent>
             <notification:endpoints>
@@ -70,7 +70,7 @@
             </notification:endpoints>
           </notification:notificationComponent>
         </sm:component>
-      </sm:activationSpec>-->
+      </sm:activationSpec>
       
     </sm:activationSpecs>
   </sm:container>
