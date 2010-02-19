@@ -13,7 +13,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-   
+
  */
 package org.openengsb.edb.jbi.endpoints.commands;
 
@@ -26,29 +26,27 @@ import org.openengsb.edb.jbi.endpoints.XmlParserFunctions;
 import org.openengsb.edb.jbi.endpoints.XmlParserFunctions.RequestWrapper;
 
 public class EDBReset implements EDBEndpointCommand {
-	private EDBHandler handler;
-	private Log log;
+    private EDBHandler handler;
+    private Log log;
 
-	public EDBReset(EDBHandler handler, Log log) {
-		this.handler = handler;
-		this.log = log;
-	}
+    public EDBReset(EDBHandler handler, Log log) {
+        this.handler = handler;
+        this.log = log;
+    }
 
-	@Override
-	public String execute(NormalizedMessage in) throws Exception {
-		String body = null;
-		final RequestWrapper req = XmlParserFunctions.parseResetMessage(in);
-		log.debug(String.format(
-				"Reset request %s %s received, processing now.", req
-						.getHeadId(), req.getDepth()));
-		try {
-			body = XmlParserFunctions.buildResetBody(handler.reset(req
-					.getHeadId(), req.getDepth()));
-		} catch (final EDBException e) {
-			body = XmlParserFunctions.buildResetErrorBody(e.getMessage(), e
-					.getStackTrace().toString());
-		}
-		return body;
-	}
+    @Override
+    public CommandResult execute(NormalizedMessage in) throws Exception {
+        String body = null;
+        final RequestWrapper req = XmlParserFunctions.parseResetMessage(in);
+        log.debug(String.format("Reset request %s %s received, processing now.", req.getHeadId(), req.getDepth()));
+        try {
+            body = XmlParserFunctions.buildResetBody(handler.reset(req.getHeadId(), req.getDepth()));
+        } catch (final EDBException e) {
+            body = XmlParserFunctions.buildResetErrorBody(e.getMessage(), e.getStackTrace().toString());
+        }
+        CommandResult result = new CommandResult();
+        result.responseString = body;
+        return result;
+    }
 
 }
